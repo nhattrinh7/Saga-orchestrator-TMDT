@@ -1,6 +1,6 @@
 import { createZodDto } from 'nestjs-zod'
 import z from 'zod'
-import { OrderStatus } from '~/domain/enums/order.enum'
+import { OrderStatus, OrderPaymentMethod } from '~/domain/enums/saga.enum'
 
 export const OrderSchema = z.object({
   id: z.uuid(),
@@ -8,7 +8,10 @@ export const OrderSchema = z.object({
   userId: z.uuid(),
   shopId: z.uuid(),
   status: z.enum(OrderStatus),
-  shippingAddressId: z.uuid(),
+  paymentMethod: z.enum(OrderPaymentMethod),
+  shippingAddress: z.string(),
+  receiverName: z.string(),
+  receiverPhoneNumber: z.string(),
   subtotal: z.number().min(0),
   shippingFee: z.number().min(0),
   szoneVoucherDiscount: z.number().min(0),

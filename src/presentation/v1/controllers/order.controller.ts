@@ -3,9 +3,12 @@ import {
   Controller,
   Get,
   Param,
+  Post,
+  Headers,
 } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { GetOrderToShipperQuery } from '~/application/queries/get-order-to-shipper/get-order-to-shipper.query';
+import { CalculatePriceRequestDto } from '~/presentation/dtos/calculate-price.dto'
+import { CalculatePriceCommand } from '~/application/commands/calculate-price/calculate-price.command'
 
 @Controller('v1/orders')
 export class OrderController {
@@ -14,14 +17,31 @@ export class OrderController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Get(':id/shipper')
-  async getOrderToShipper(
-    @Param('id') orderId: string,
-    @Body() body: { name: string; phoneNumber: string },
+  // @Get(':id/shipper')
+  // async getOrderToShipper(
+  //   @Param('id') orderId: string,
+  //   @Body() body: { name: string; phoneNumber: string },
+  // ) {
+  //   const result = await this.queryBus.execute(new GetOrderToShipperQuery(orderId, body))
+
+  //   return { message: 'Get order to shipper successful', data: result }
+  // }
+
+  @Post('calculate-price')
+  async calculatePrice(
+    @Body() body: CalculatePriceRequestDto,
+    @Headers('x-user-id') userId: string,
   ) {
-    const result = await this.queryBus.execute(new GetOrderToShipperQuery(orderId, body))
+    console.log('userId', userId)
+    const result = await this.commandBus.execute(
+      new CalculatePriceCommand(
+        body.itemsByShop,
+        userId,
+        body.szoneVoucherId,
+        body.shopVouchers
+      )
+    )
 
-    return { message: 'Get order to shipper successful', data: result }
+    return result
   }
-
 }

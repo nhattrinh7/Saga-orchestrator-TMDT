@@ -36,6 +36,24 @@ import { CqrsModule } from '@nestjs/cqrs'
           persistent: true,
         },
       },
+      {
+        name: 'CATALOG_CLIENT',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://admin:admin123@localhost:5672'],
+          queue: 'catalog_queue',
+          persistent: true,
+        },
+      },
+      {
+        name: 'VOUCHER_CLIENT',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://admin:admin123@localhost:5672'],
+          queue: 'voucher_queue',
+          persistent: true,
+        },
+      },
     ]),
   ],
   controllers: [

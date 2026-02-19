@@ -4,11 +4,10 @@ import { DatabaseModule } from '~/infrastructure/database/database.module'
 import { MessagingModule } from '~/infrastructure/messaging/messaging.module'
 
 const CommandHandlers = [
-  
 ]
 
 const QueryHandlers = [
-  
+
 ]
 
 const EventHandlers = [

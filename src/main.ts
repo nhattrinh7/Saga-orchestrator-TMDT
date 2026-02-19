@@ -24,8 +24,8 @@ async function bootstrap() {
       exchange: 'events_exchange',
       exchangeType: 'topic',
       wildcards: true,
-      queue: 'order_queue',
-      consumerTag: 'order_consumer',
+      queue: 'saga_queue',
+      consumerTag: 'saga_consumer',
       queueOptions: {
         durable: true, // queue được persist để ko mất khi restart
         exclusive: false, // nhiều consumer có thể consume queue này
