@@ -9,3 +9,50 @@ datasource db {
   url      = env("DATABASE_URL") 
 }
 
+model Saga {
+  id            String     @id @default(uuid()) @db.Uuid
+  userId        String     @map("user_id") @db.Uuid
+  sagaType      String     @default("ORDER_SAGA") @map("saga_type") @db.VarChar(50)
+  status        SagaStatus @default(STARTED)
+  currentStep   String?    @map("current_step") @db.VarChar(100)
+  data          Json       // Dữ liệu đầu vào, không thay đổi trong quá trình chạy
+  failureReason String?    @map("failure_reason") @db.Text
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  completedAt   DateTime?  @map("completed_at") @db.Timestamptz
+  compensatedAt DateTime?  @map("compensated_at") @db.Timestamptz
+
+  steps SagaStep[]
+
+  @@map("sagas")
+}
+
+model SagaStep {
+  id        String     @id @default(uuid()) @db.Uuid
+  sagaId    String     @map("saga_id") @db.Uuid
+  stepName  String     @map("step_name") @db.VarChar(100)
+  status    StepStatus @default(PROCESSING)
+  result    Json?
+  error     Json?
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+
+  saga Saga @relation(fields: [sagaId], references: [id], onDelete: Cascade)
+
+  @@map("saga_steps")
+}
+
+enum SagaStatus {
+  STARTED
+  PROCESSING
+  COMPLETED
+  COMPENSATING
+  COMPENSATED
+}
+
+enum StepStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+  COMPENSATING
+  COMPENSATED
+}

@@ -1,11 +1,22 @@
 import { AggregateRoot } from '@nestjs/cqrs'
-import { v4 as uuidv4 } from 'uuid'
-import { SagaType } from '~/domain/enums/saga.enum'
+import { SagaStatus } from '~/domain/enums/saga.enum'
+import { SagaStep } from '~/domain/entities/saga-step.entity'
 
 export class Saga extends AggregateRoot {
-  constructor(
-    
-  ) {
+  id: string
+  userId: string
+  sagaType: string
+  status: SagaStatus
+  currentStep: string | null
+  data: any
+  failureReason: string | null
+  createdAt: Date
+  completedAt: Date | null
+  compensatedAt: Date | null
+  steps: SagaStep[]
+
+  constructor(partial: Partial<Saga>) {
     super()
+    Object.assign(this, partial)
   }
-} 
+}

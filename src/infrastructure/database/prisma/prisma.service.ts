@@ -26,6 +26,13 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     }
   }
 
+  async transaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+    return this.$transaction(fn, {
+      maxWait: 10000,  // 10s chờ lấy connection từ pool
+      timeout: 15000,  // 15s cho transaction hoàn thành
+    })
+  }
+
   async onModuleDestroy() {
     await this.$disconnect()
     this.logger.log('Database disconnected')

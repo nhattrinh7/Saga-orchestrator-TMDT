@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import Joi from 'joi'
 import { ZodValidationPipe } from 'nestjs-zod'
@@ -8,7 +8,8 @@ import { ApplicationModule } from '~/application/application.module'
 import { InfrastructureModule } from '~/infrastructure/infrastructure.module'
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
 import { APP_GUARD } from '@nestjs/core'
-
+import { BullModule } from '@nestjs/bullmq'
+import { RequestLoggingMiddleware } from '~/common/middleware/request-logging.middleware'
 
 @Module({
   imports: [
@@ -33,6 +34,12 @@ import { APP_GUARD } from '@nestjs/core'
         abortEarly: true, // Show 1 errors per times
       },
     }),
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost', // localhost:6379 là địa chỉ của redis
+        port: 6379,
+      },
+    }),
     InfrastructureModule,
     ApplicationModule,
     PresentationModule,
@@ -48,4 +55,8 @@ import { APP_GUARD } from '@nestjs/core'
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLoggingMiddleware).forRoutes('{*path}')
+  }
+}

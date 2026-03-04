@@ -38,7 +38,7 @@ async function bootstrap() {
 
   await app.startAllMicroservices()
 
-  await app.listen(env.config.PORT ?? 3008)
+  await app.listen(env.config.PORT ?? 3012)
 }
 
 // eslint-disable-next-line no-console
