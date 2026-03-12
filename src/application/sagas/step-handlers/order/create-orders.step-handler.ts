@@ -62,10 +62,10 @@ export class CreateOrdersStepHandler implements ISagaStepHandler {
     // Xác định cancel status:
     // - WALLET/QRCODE: nếu fail vì lý do thanh toán → PAYMENT_FAILED
     //   (ví dụ: sai passcode, hết số dư, timeout, payment webhook error)
-    // - COD hoặc fail trước bước thanh toán → CANCELLED
+    // - COD hoặc fail trước bước thanh toán → ORDER_FAILED
     const paymentMethod = saga.data?.paymentMethod
     const isPaymentRelated = paymentMethod === 'WALLET' || paymentMethod === 'QRCODE'
-    const cancelStatus = isPaymentRelated ? 'PAYMENT_FAILED' : 'CANCELLED'
+    const cancelStatus = isPaymentRelated ? 'PAYMENT_FAILED' : 'ORDER_FAILED'
 
     return {
       sagaId,

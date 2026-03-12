@@ -19,7 +19,7 @@ export abstract class BaseRetryConsumer {
 
     return requestContext.run({ kongRequestId }, async () => {
       if (retryCount > this.maxRetries) {
-        this.logger.error(`[${kongRequestId}] Max retries (${this.maxRetries}) exceeded, sending to DLQ`)
+        this.logger.error(`[kongRequestId=${kongRequestId}] Max retries (${this.maxRetries}) exceeded, sending to DLQ`)
         const serviceName = process.env.SERVICE_NAME || 'unknown-service'
         channel.publish('events_exchange', `dlq.${serviceName}`, originalMsg.content, {
           persistent: true,
@@ -39,7 +39,7 @@ export abstract class BaseRetryConsumer {
       try {
         const result = await handler()
         channel.ack(originalMsg)
-        this.logger.log(`[${kongRequestId}] Message processed successfully`)
+        this.logger.log(`[kongRequestId=${kongRequestId}] Message processed successfully`)
         return result
       } catch {
         const baseDelayForRetry = this.baseDelay * Math.pow(2, retryCount)
@@ -48,7 +48,7 @@ export abstract class BaseRetryConsumer {
         const jitterDelay = Math.floor(minDelay + Math.random() * (maxDelay - minDelay))
         const originalRoutingKey =
           originalMsg.properties.headers?.['x-original-routing-key'] || context.getPattern()
-        this.logger.warn(`[${kongRequestId}] Retry ${retryCount + 1}/${this.maxRetries} after ${jitterDelay}ms — routing: ${originalRoutingKey}`)
+        this.logger.warn(`[kongRequestId=${kongRequestId}] Retry ${retryCount + 1}/${this.maxRetries} after ${jitterDelay}ms — routing: ${originalRoutingKey}`)
         setTimeout(() => {
           channel.publish('events_exchange', originalRoutingKey, originalMsg.content, {
             persistent: true,
