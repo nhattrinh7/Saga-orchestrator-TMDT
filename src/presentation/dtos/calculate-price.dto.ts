@@ -49,6 +49,7 @@ export interface SummaryDto {
   shippingFee: number
   shopsVoucherDiscount: number
   szoneVoucherDiscount: number
+  goodsPrice: number
   finalPrice: number
 }
 

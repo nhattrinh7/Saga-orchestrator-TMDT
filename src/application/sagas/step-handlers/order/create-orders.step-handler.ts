@@ -123,6 +123,7 @@ export class CreateOrdersStepHandler implements ISagaStepHandler {
         shippingFee: shopBreakdown.shippingFee,
         shopVoucherDiscount: shopBreakdown.shopVoucherDiscount,
         szoneVoucherDiscount: shopBreakdown.szoneVoucherDiscount,
+        goodsPrice: shopBreakdown.goodsPrice,
         finalPrice: shopBreakdown.finalPrice,
         paymentMethod,
         paymentId,
