@@ -63,6 +63,11 @@ export class SagaStepResultConsumer extends BaseRetryConsumer {
     await this.handleResult(SagaStepName.REMOVE_CART_ITEMS, data, ctx)
   }
 
+  @EventPattern('saga.result.increase-buy-count')
+  async onIncreaseBuyCount(@Payload() data: any, @Ctx() ctx: RmqContext) {
+    await this.handleResult(SagaStepName.INCREASE_BUY_COUNT, data, ctx)
+  }
+
   @EventPattern('saga.result.verify-passcode-and-deduct')
   async onWalletPayment(@Payload() data: any, @Ctx() ctx: RmqContext) {
     await this.handleResult(SagaStepName.PROCESS_WALLET_PAYMENT, data, ctx)

@@ -20,6 +20,7 @@ import {
   CreateOrdersStepHandler,
   ConfirmVouchersStepHandler,
   RemoveCartItemsStepHandler,
+  IncreaseBuyCountStepHandler,
   ProcessWalletPaymentStepHandler,
 } from '~/application/sagas/step-handlers/order'
 
@@ -34,6 +35,7 @@ const OrderSagaStepHandlers = [
   CreateOrdersStepHandler,
   ConfirmVouchersStepHandler,
   RemoveCartItemsStepHandler,
+  IncreaseBuyCountStepHandler,
   ProcessWalletPaymentStepHandler,
 ]
 

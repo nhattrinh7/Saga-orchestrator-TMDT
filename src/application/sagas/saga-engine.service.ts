@@ -192,13 +192,30 @@ export class SagaEngine {
       sagaId, userId: saga.userId, productVariantIds,
     })
 
-    // 4. Hoàn thành saga
+    // 4. Tăng buy_count cho sản phẩm
+    const quantities = new Map<string, number>()
+    for (const item of allItems) {
+      const current = quantities.get(item.productId) ?? 0
+      quantities.set(item.productId, current + item.quantity)
+    }
+    const items = Array.from(quantities.entries()).map(([productId, quantity]) => ({
+      productId,
+      quantity,
+    }))
+    if (items.length > 0) {
+      this.emitToService('catalog', 'saga.increase-buy-count', {
+        sagaId,
+        items,
+      })
+    }
+
+    // 5. Hoàn thành saga
     await this.sagaRepo.updateSagaStatus(sagaId, SagaStatus.COMPLETED, {
       currentStep: null,
       completedAt: new Date(),
     })
 
-    // 5. Notify FE
+    // 6. Notify FE
     this.paymentNotifier.emitPaymentSuccess(saga.userId, {
       orderIds,
       message: 'Thanh toán thành công',
