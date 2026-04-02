@@ -38,6 +38,8 @@ model SagaStep {
 
   saga Saga @relation(fields: [sagaId], references: [id], onDelete: Cascade)
 
+  @@index([sagaId, stepName])
+  @@index([sagaId, status, createdAt(sort: Desc)])
   @@map("saga_steps")
 }
 
