@@ -1,5 +1,5 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import Joi from 'joi'
 import { ZodValidationPipe } from 'nestjs-zod'
 import { APP_PIPE } from '@nestjs/core'
@@ -26,19 +26,34 @@ import { RequestLoggingMiddleware } from '~/common/middleware/request-logging.mi
       }
     ]),
     ConfigModule.forRoot({
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,      
       isGlobal: true,
       validationSchema: Joi.object({
         DATABASE_URL: Joi.string().required(),
+      
+        SERVICE_NAME: Joi.string().required(),
+        SERVICE_HOST: Joi.string().required(),
+        PORT: Joi.number().required(),
+        ACCESS_TOKEN_SECRET: Joi.string().allow('').optional(),
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.number().required(),
+        REDIS_PASSWORD: Joi.string().allow('').optional(),
+        RABBITMQ_HOST: Joi.string().required(),
       }),
       validationOptions: {
         abortEarly: true, // Show 1 errors per times
       },
     }),
-    BullModule.forRoot({
-      connection: {
-        host: 'localhost', // localhost:6379 là địa chỉ của redis
-        port: 6379,
-      },
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get<string>('REDIS_HOST', 'localhost'),
+          port: configService.get<number>('REDIS_PORT', 6379),
+          password: configService.get<string>('REDIS_PASSWORD'),
+        },
+      }),
     }),
     InfrastructureModule,
     ApplicationModule,

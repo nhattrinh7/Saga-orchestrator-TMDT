@@ -20,7 +20,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://admin:admin123@localhost:5672'], // lên production thì sửa localhost thành rabbitmq-service
+      urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`], // lên production thì sửa localhost thành rabbitmq-service
       exchange: 'events_exchange',
       exchangeType: 'topic',
       wildcards: true,

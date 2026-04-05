@@ -20,7 +20,7 @@ import { QueueModule } from '~/infrastructure/queue/queue.module'
         name: 'CATALOG_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'catalog_queue',
           persistent: true,
         },
@@ -29,7 +29,7 @@ import { QueueModule } from '~/infrastructure/queue/queue.module'
         name: 'USER_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'user_queue',
           persistent: true,
         },
@@ -38,7 +38,7 @@ import { QueueModule } from '~/infrastructure/queue/queue.module'
         name: 'VOUCHER_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'voucher_queue',
           persistent: true,
         },
@@ -47,7 +47,7 @@ import { QueueModule } from '~/infrastructure/queue/queue.module'
         name: 'INVENTORY_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'inventory_queue',
           persistent: true,
         },
@@ -56,7 +56,7 @@ import { QueueModule } from '~/infrastructure/queue/queue.module'
         name: 'ORDER_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'order_queue',
           persistent: true,
         },
@@ -65,7 +65,7 @@ import { QueueModule } from '~/infrastructure/queue/queue.module'
         name: 'PAYMENT_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'payment_queue',
           persistent: true,
         },
@@ -74,7 +74,7 @@ import { QueueModule } from '~/infrastructure/queue/queue.module'
         name: 'NOTIFICATION_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'notification_queue',
           persistent: true,
         },
