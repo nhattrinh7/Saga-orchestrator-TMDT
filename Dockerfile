@@ -1,5 +1,5 @@
 # 1. Stage deps: tải Production Dependencies ĐỂ DÀNH
-FROM node:20-alpine AS deps
+FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json yarn.lock ./
 COPY prisma.config.ts ./
@@ -8,7 +8,7 @@ RUN yarn install --production --frozen-lockfile
 RUN yarn add prisma --production
 
 # 2. Stage builder: cài full tĩnh và build code
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package.json yarn.lock ./
 COPY prisma.config.ts ./
@@ -18,7 +18,7 @@ COPY . .
 RUN yarn build
 
 # 3. Stage runner
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 ENV NODE_ENV='production'
 WORKDIR /app
 
@@ -30,3 +30,4 @@ COPY --from=builder /app/prisma.config.ts ./
 COPY --from=builder /app/src/infrastructure/database/prisma/ ./src/infrastructure/database/prisma/
 
 CMD ["yarn", "start:prod"]
+
