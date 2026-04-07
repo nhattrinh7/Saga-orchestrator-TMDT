@@ -1,5 +1,11 @@
 import { defineConfig, env } from 'prisma/config'
-import 'dotenv/config'
+import { config } from 'dotenv'
+
+const envPath =
+  process.env.DOTENV_CONFIG_PATH ??
+  (process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development')
+
+config({ path: envPath })
 
 export default defineConfig({
   schema: 'src/infrastructure/database/prisma/schema.prisma',
@@ -11,3 +17,4 @@ export default defineConfig({
     url: env('DATABASE_URL'),
   },
 })
+
