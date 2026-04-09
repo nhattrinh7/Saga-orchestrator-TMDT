@@ -5,7 +5,7 @@ COPY package.json yarn.lock ./
 COPY prisma.config.ts ./
 COPY src/infrastructure/database/prisma/ ./src/infrastructure/database/prisma/
 RUN yarn install --production --frozen-lockfile
-RUN yarn add prisma --production
+RUN yarn add prisma@6 --production
 
 # 2. Stage builder: cài full tĩnh và build code
 FROM node:22-alpine AS builder
