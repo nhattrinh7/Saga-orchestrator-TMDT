@@ -18,10 +18,7 @@ import { PAYMENT_QUEUE_NAME } from '~/common/constants/constant'
     WebSocketModule,
     forwardRef(() => ApplicationModule),
   ],
-  providers: [
-    PaymentTimeoutService,
-    PaymentTimeoutProcessor,
-  ],
+  providers: [PaymentTimeoutService, PaymentTimeoutProcessor],
   exports: [PaymentTimeoutService],
 })
 export class QueueModule {}

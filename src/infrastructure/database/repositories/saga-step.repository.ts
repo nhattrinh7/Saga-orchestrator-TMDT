@@ -7,10 +7,13 @@ import { SagaStepName, StepStatus } from '~/domain/enums/saga-step.enum'
 export class SagaStepRepository implements ISagaStepRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createStep(data: {
-    sagaId: string
-    stepName: SagaStepName
-  }, tx?: any): Promise<string> {
+  async createStep(
+    data: {
+      sagaId: string
+      stepName: SagaStepName
+    },
+    tx?: any,
+  ): Promise<string> {
     const client = tx || this.prisma
     const step = await client.sagaStep.create({
       data: {
@@ -22,10 +25,15 @@ export class SagaStepRepository implements ISagaStepRepository {
     return step.id
   }
 
-  async updateStepStatus(stepId: string, status: StepStatus, data?: {
-    result?: any
-    error?: any
-  }, tx?: any): Promise<void> {
+  async updateStepStatus(
+    stepId: string,
+    status: StepStatus,
+    data?: {
+      result?: any
+      error?: any
+    },
+    tx?: any,
+  ): Promise<void> {
     const client = tx || this.prisma
     await client.sagaStep.update({
       where: { id: stepId },
@@ -36,7 +44,10 @@ export class SagaStepRepository implements ISagaStepRepository {
     })
   }
 
-  async findStepByName(sagaId: string, stepName: SagaStepName): Promise<{
+  async findStepByName(
+    sagaId: string,
+    stepName: SagaStepName,
+  ): Promise<{
     id: string
     status: StepStatus
     result: any
@@ -53,12 +64,14 @@ export class SagaStepRepository implements ISagaStepRepository {
     }
   }
 
-  async findCompletedSteps(sagaId: string): Promise<Array<{
-    id: string
-    stepName: SagaStepName
-    status: StepStatus
-    result: any
-  }>> {
+  async findCompletedSteps(sagaId: string): Promise<
+    Array<{
+      id: string
+      stepName: SagaStepName
+      status: StepStatus
+      result: any
+    }>
+  > {
     const steps = await this.prisma.sagaStep.findMany({
       where: { sagaId, status: StepStatus.COMPLETED },
       orderBy: { createdAt: 'desc' },

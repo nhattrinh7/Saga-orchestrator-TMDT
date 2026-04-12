@@ -24,7 +24,6 @@ type PriceCalculationResult = {
   shopBreakdowns: ShopBreakdown[]
 }
 
-
 /**
  * CalculateVerifyPriceStepHandler
  *
@@ -155,10 +154,12 @@ export class CalculateVerifyPriceStepHandler implements ISagaStepHandler {
 
     for (const shop of shopBreakdowns) {
       shop.goodsPrice = shop.subtotal - shop.shopVoucherDiscount - shop.szoneVoucherDiscount
-      shop.finalPrice = shop.subtotal + shop.shippingFee - shop.shopVoucherDiscount - shop.szoneVoucherDiscount
+      shop.finalPrice =
+        shop.subtotal + shop.shippingFee - shop.shopVoucherDiscount - shop.szoneVoucherDiscount
     }
 
-    const finalPrice = totalSubtotal + totalShippingFee - totalShopVoucherDiscount - szoneVoucherDiscount
+    const finalPrice =
+      totalSubtotal + totalShippingFee - totalShopVoucherDiscount - szoneVoucherDiscount
     const goodsPrice = totalSubtotal - totalShopVoucherDiscount - szoneVoucherDiscount
 
     return {

@@ -22,7 +22,9 @@ export const setConfigService = (configService: ConfigService) => {
 export const env = new Proxy({} as EnvConfig, {
   get(_, prop) {
     if (!envInstance) {
-      throw new Error('❌ EnvConfig not initialized! Call setConfigService() in AppModule constructor or main.ts')
+      throw new Error(
+        '❌ EnvConfig not initialized! Call setConfigService() in AppModule constructor or main.ts',
+      )
     }
     return envInstance[prop as keyof EnvConfig]
   },

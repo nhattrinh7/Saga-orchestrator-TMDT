@@ -1,3 +1,4 @@
+import { HealthModule } from './health/health.module'
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import Joi from 'joi'
@@ -15,22 +16,22 @@ import { RequestLoggingMiddleware } from '~/common/middleware/request-logging.mi
   imports: [
     ThrottlerModule.forRoot([
       {
-        name: 'short',  
-        ttl: 1000,          
-        limit: 100,          
+        name: 'short',
+        ttl: 1000,
+        limit: 100,
       },
       {
         name: 'long',
-        ttl: 60000,       
+        ttl: 60000,
         limit: 500,
-      }
+      },
     ]),
     ConfigModule.forRoot({
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,      
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       isGlobal: true,
       validationSchema: Joi.object({
         DATABASE_URL: Joi.string().required(),
-      
+
         SERVICE_NAME: Joi.string().required(),
         SERVICE_HOST: Joi.string().required(),
         PORT: Joi.number().required(),
@@ -58,6 +59,7 @@ import { RequestLoggingMiddleware } from '~/common/middleware/request-logging.mi
     InfrastructureModule,
     ApplicationModule,
     PresentationModule,
+    HealthModule,
   ],
   providers: [
     {

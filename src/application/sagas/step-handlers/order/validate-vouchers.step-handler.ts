@@ -29,17 +29,17 @@ export class ValidateVouchersStepHandler implements ISagaStepHandler {
     // Chuẩn bị data cho từng shop voucher
     const shopVoucherData = shopVouchers
       ? Object.entries(shopVouchers).map(([shopId, voucherId]) => {
-        const shopItems = itemsByShop[shopId] || []
-        const orderValue = shopItems.reduce((sum: number, item: any) => {
-          const variant = variants.find((v: any) => v.id === item.productVariantId)
-          return sum + (variant?.price || 0) * item.quantity
-        }, 0)
-        const items = shopItems.map((item: any) => {
-          const variant = variants.find((v: any) => v.id === item.productVariantId)
-          return { productId: item.productId, categoryId: variant?.categoryId }
+          const shopItems = itemsByShop[shopId] || []
+          const orderValue = shopItems.reduce((sum: number, item: any) => {
+            const variant = variants.find((v: any) => v.id === item.productVariantId)
+            return sum + (variant?.price || 0) * item.quantity
+          }, 0)
+          const items = shopItems.map((item: any) => {
+            const variant = variants.find((v: any) => v.id === item.productVariantId)
+            return { productId: item.productId, categoryId: variant?.categoryId }
+          })
+          return { voucherId, orderValue, items }
         })
-        return { voucherId, orderValue, items }
-      })
       : []
 
     // Chuẩn bị data cho szone voucher (nếu có)
@@ -73,5 +73,4 @@ export class ValidateVouchersStepHandler implements ISagaStepHandler {
       voucherIds,
     }
   }
-
 }

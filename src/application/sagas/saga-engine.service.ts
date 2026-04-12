@@ -1,13 +1,29 @@
 import { Injectable, Inject, Logger } from '@nestjs/common'
-import { type ISagaRepository, SAGA_REPOSITORY } from '~/domain/repositories/saga.repository.interface'
-import { type ISagaStepRepository, SAGA_STEP_REPOSITORY } from '~/domain/repositories/saga-step.repository.interface'
-import { type IMessagePublisher, MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
+import {
+  type ISagaRepository,
+  SAGA_REPOSITORY,
+} from '~/domain/repositories/saga.repository.interface'
+import {
+  type ISagaStepRepository,
+  SAGA_STEP_REPOSITORY,
+} from '~/domain/repositories/saga-step.repository.interface'
+import {
+  type IMessagePublisher,
+  MESSAGE_PUBLISHER,
+} from '~/domain/contracts/message-publisher.interface'
 import { SagaStatus } from '~/domain/enums/saga.enum'
 import { StepStatus, SagaStepName } from '~/domain/enums/saga-step.enum'
-import { SagaDefinition, StepDefinition, TargetService } from '~/domain/contracts/saga-definition.interface'
+import {
+  SagaDefinition,
+  StepDefinition,
+  TargetService,
+} from '~/domain/contracts/saga-definition.interface'
 import { StepHandlerRegistry } from '~/application/sagas/step-handler-registry.service'
 import { Saga } from '~/domain/entities/saga.entity'
-import { type IPaymentNotifier, PAYMENT_NOTIFIER } from '~/domain/contracts/payment-notifier.interface'
+import {
+  type IPaymentNotifier,
+  PAYMENT_NOTIFIER,
+} from '~/domain/contracts/payment-notifier.interface'
 import { getUsedVoucherIds } from '~/common/utils/get-used-voucher-ids.util'
 import { PrismaService } from '~/infrastructure/database/prisma/prisma.service'
 
@@ -85,7 +101,9 @@ export class SagaEngine {
    */
   async handleStepResult(sagaId: string, stepName: SagaStepName, result: any): Promise<void> {
     try {
-      this.logger.log(`handleStepResult: sagaId=${sagaId}, step=${stepName}, success=${result.success}`)
+      this.logger.log(
+        `handleStepResult: sagaId=${sagaId}, step=${stepName}, success=${result.success}`,
+      )
 
       const saga = await this.sagaRepo.findById(sagaId)
       if (!saga || saga.status !== SagaStatus.PROCESSING) return
@@ -135,7 +153,9 @@ export class SagaEngine {
         // Khi external trigger đến (wallet/webhook) → `handlePostPaymentSuccess`() sẽ hoàn tất saga.
 
         // Gọi afterComplete của handler nếu có (ví dụ: CreateOrdersStepHandler schedule payment timeout)
-        const handler = this.handlerRegistry.has(stepName) ? this.handlerRegistry.get(stepName) : null
+        const handler = this.handlerRegistry.has(stepName)
+          ? this.handlerRegistry.get(stepName)
+          : null
         if (handler?.afterComplete) {
           await handler.afterComplete(sagaId, saga, result)
         }
@@ -145,7 +165,9 @@ export class SagaEngine {
       // ===== Bình thường: advance tới step tiếp =====
       await this.advanceToNextStep(sagaId, saga)
     } catch (error: any) {
-      this.logger.error(`handleStepResult CRASHED: sagaId=${sagaId}, step=${stepName}, ${error.message}`)
+      this.logger.error(
+        `handleStepResult CRASHED: sagaId=${sagaId}, step=${stepName}, ${error.message}`,
+      )
       throw error // re-throw để consumer retry
     }
   }
@@ -169,19 +191,26 @@ export class SagaEngine {
     const { itemsByShop, shopVouchers, szoneVoucherId } = saga.data
 
     // Lấy orderIds từ CREATE_ORDERS step
-    const createOrdersStep = await this.sagaStepRepo.findStepByName(sagaId, SagaStepName.CREATE_ORDERS)
+    const createOrdersStep = await this.sagaStepRepo.findStepByName(
+      sagaId,
+      SagaStepName.CREATE_ORDERS,
+    )
     const orderIds = createOrdersStep?.result?.orderIds || []
 
     // 1. Update orders → AWAITING_CONFIRMATION
     this.emitToService('order', 'saga.update-orders-status', {
-      sagaId, orderIds, status: 'AWAITING_CONFIRMATION',
+      sagaId,
+      orderIds,
+      status: 'AWAITING_CONFIRMATION',
     })
 
     // 2. Confirm vouchers (nếu có)
     const voucherIds = getUsedVoucherIds(shopVouchers, szoneVoucherId)
     if (voucherIds.length > 0) {
       this.emitToService('voucher', 'saga.confirm-vouchers', {
-        sagaId, userId: saga.userId, voucherIds,
+        sagaId,
+        userId: saga.userId,
+        voucherIds,
       })
     }
 
@@ -189,7 +218,9 @@ export class SagaEngine {
     const allItems = Object.values(itemsByShop).flat() as any[]
     const productVariantIds = allItems.map((item: any) => item.productVariantId)
     this.emitToService('user', 'saga.remove-cart-items', {
-      sagaId, userId: saga.userId, productVariantIds,
+      sagaId,
+      userId: saga.userId,
+      productVariantIds,
     })
 
     // 4. Tăng buy_count cho sản phẩm
@@ -234,14 +265,18 @@ export class SagaEngine {
     await this.sagaRepo.updateSagaStatus(sagaId, SagaStatus.COMPENSATING, { failureReason })
 
     const completedSteps = await this.sagaStepRepo.findCompletedSteps(sagaId)
-    this.logger.log(`compensate: sagaId=${sagaId}, reason="${failureReason}", completedSteps=[${completedSteps.map(s => s.stepName).join(', ')}]`)
+    this.logger.log(
+      `compensate: sagaId=${sagaId}, reason="${failureReason}", completedSteps=[${completedSteps.map(s => s.stepName).join(', ')}]`,
+    )
 
-    for (const step of completedSteps) {  
+    for (const step of completedSteps) {
       try {
         // Tìm compensation config trong definition
         const compDef = definition.compensation[step.stepName]
         if (!compDef) {
-          this.logger.log(`compensate: step ${step.stepName} — không có compensation config, bỏ qua`)
+          this.logger.log(
+            `compensate: step ${step.stepName} — không có compensation config, bỏ qua`,
+          )
           continue // Step này không cần compensate
         }
 
@@ -257,7 +292,9 @@ export class SagaEngine {
             this.emitToService(compDef.service, compDef.event, payload)
           }
         } else {
-          this.logger.warn(`compensate: step ${step.stepName} — handler KHÔNG tìm thấy, bỏ qua compensation`)
+          this.logger.warn(
+            `compensate: step ${step.stepName} — handler KHÔNG tìm thấy, bỏ qua compensation`,
+          )
         }
 
         await this.sagaStepRepo.updateStepStatus(step.id, StepStatus.COMPENSATED)
@@ -355,7 +392,10 @@ export class SagaEngine {
     })
 
     // Notify FE thành công
-    const createOrdersStep = await this.sagaStepRepo.findStepByName(sagaId, SagaStepName.CREATE_ORDERS)
+    const createOrdersStep = await this.sagaStepRepo.findStepByName(
+      sagaId,
+      SagaStepName.CREATE_ORDERS,
+    )
     const orderIds = createOrdersStep?.result?.orderIds || []
     this.paymentNotifier.emitPaymentSuccess(saga.userId, {
       orderIds,
@@ -380,13 +420,20 @@ export class SagaEngine {
     if (stepDef.isLocal) {
       // ===== Local Step =====
       if (!handler.executeLocal) {
-        throw new Error(`Step "${stepDef.name}" is marked as local but handler has no executeLocal()`)
+        throw new Error(
+          `Step "${stepDef.name}" is marked as local but handler has no executeLocal()`,
+        )
       }
 
       // Transaction: createStep + updateSagaStatus phải atomic
-      const stepId = await this.prismaService.transaction(async (tx) => {
+      const stepId = await this.prismaService.transaction(async tx => {
         const id = await this.sagaStepRepo.createStep({ sagaId, stepName: stepDef.name }, tx)
-        await this.sagaRepo.updateSagaStatus(sagaId, SagaStatus.PROCESSING, { currentStep: stepDef.name }, tx)
+        await this.sagaRepo.updateSagaStatus(
+          sagaId,
+          SagaStatus.PROCESSING,
+          { currentStep: stepDef.name },
+          tx,
+        )
         return id
       })
 
@@ -403,9 +450,9 @@ export class SagaEngine {
         previousResults.set(stepDef.name, result)
 
         // Trước khi advanceToNextStep thì lấy saga từ trong db ra dùng, lí do là
-        // 1. Nếu có 1 step khác chạy song song rồi thất bại và trạng thái của saga đã thành COMPENSATING, nếu vẫn dùng saga cũ PROCESSING thì 
+        // 1. Nếu có 1 step khác chạy song song rồi thất bại và trạng thái của saga đã thành COMPENSATING, nếu vẫn dùng saga cũ PROCESSING thì
         // sẽ tiếp tục thực hiện tiếp trong khi saga đáng lẽ phải dừng, điều này nguy hiểm
-        // 2. Các bước song song khác có thể đã hoàn thành, trước khi chạy bước tiếp theo thì lấy saga trong DB để đảm bảo 
+        // 2. Các bước song song khác có thể đã hoàn thành, trước khi chạy bước tiếp theo thì lấy saga trong DB để đảm bảo
         // saga lúc này chứa các thông tin mới nhất, chứa thông tin các step song song vừa mới hoàn thành kia
         // 3. Engine dc thiết kế theo hướng "State Machine". Nguyên tắc vàng của State Machine là luôn đưa ra quyết định dựa trên
         // trạng thái thực tế cuối cùng của hệ thống.
@@ -431,21 +478,28 @@ export class SagaEngine {
     const payload = handler.buildPayload(sagaId, saga, previousResults)
 
     // Transaction: createStep + updateSagaStatus phải atomic
-    await this.prismaService.transaction(async (tx) => {
+    await this.prismaService.transaction(async tx => {
       await this.sagaStepRepo.createStep({ sagaId, stepName: stepDef.name }, tx)
-      await this.sagaRepo.updateSagaStatus(sagaId, SagaStatus.PROCESSING, { currentStep: stepDef.name }, tx)
+      await this.sagaRepo.updateSagaStatus(
+        sagaId,
+        SagaStatus.PROCESSING,
+        { currentStep: stepDef.name },
+        tx,
+      )
     })
 
     this.emitToService(stepDef.service, stepDef.event, payload)
     // Remote step: chờ result quay về qua consumer → handleStepResult()
   }
 
-
   // ==================== Helpers ====================
 
   // Tìm step definition trong tất cả phases của 1 saga.
   // Dùng để check haltAfter sau khi step hoàn thành.
-  private findStepDefinition(definition: SagaDefinition, stepName: SagaStepName): StepDefinition | null {
+  private findStepDefinition(
+    definition: SagaDefinition,
+    stepName: SagaStepName,
+  ): StepDefinition | null {
     for (const phase of definition.phases) {
       const step = phase.steps.find(s => s.name === stepName)
       if (step) return step
@@ -478,7 +532,9 @@ export class SagaEngine {
   private getDefinition(sagaType: string): SagaDefinition {
     const definition = this.definitions.get(sagaType)
     if (!definition) {
-      throw new Error(`No saga definition registered for type "${sagaType}". Did you forget to register it?`)
+      throw new Error(
+        `No saga definition registered for type "${sagaType}". Did you forget to register it?`,
+      )
     }
     return definition
   }
@@ -487,5 +543,4 @@ export class SagaEngine {
   private registerDefinition(definition: SagaDefinition): void {
     this.definitions.set(definition.sagaType, definition)
   }
-
 }

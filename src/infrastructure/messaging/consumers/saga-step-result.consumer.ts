@@ -15,9 +15,7 @@ import { BaseRetryConsumer } from '~/common/utils/base-retry.consumer'
  */
 @Controller()
 export class SagaStepResultConsumer extends BaseRetryConsumer {
-  constructor(
-    private readonly sagaEngine: SagaEngine,
-  ) {
+  constructor(private readonly sagaEngine: SagaEngine) {
     super()
   }
 
@@ -79,11 +77,7 @@ export class SagaStepResultConsumer extends BaseRetryConsumer {
    * Xử lý chung cho tất cả step results.
    * Mỗi @EventPattern chỉ gọi method này với stepName tương ứng.
    */
-  private async handleResult(
-    stepName: SagaStepName,
-    data: any,
-    ctx: RmqContext,
-  ): Promise<void> {
+  private async handleResult(stepName: SagaStepName, data: any, ctx: RmqContext): Promise<void> {
     await this.handleWithRetry(ctx, async () => {
       await this.sagaEngine.handleStepResult(data.sagaId, stepName, data)
     })

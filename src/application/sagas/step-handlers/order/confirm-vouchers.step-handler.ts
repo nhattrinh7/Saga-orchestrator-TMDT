@@ -34,5 +34,4 @@ export class ConfirmVouchersStepHandler implements ISagaStepHandler {
       voucherIds,
     }
   }
-
 }

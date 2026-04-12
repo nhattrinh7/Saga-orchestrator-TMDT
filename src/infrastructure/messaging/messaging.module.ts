@@ -81,10 +81,7 @@ import { QueueModule } from '~/infrastructure/queue/queue.module'
       },
     ]),
   ],
-  controllers: [
-    PaymentWebhookConsumer,
-    SagaStepResultConsumer,
-  ],
+  controllers: [PaymentWebhookConsumer, SagaStepResultConsumer],
   providers: [
     {
       provide: MESSAGE_PUBLISHER,

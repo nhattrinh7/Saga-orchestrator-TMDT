@@ -30,7 +30,12 @@ export class ReserveInventoryStepHandler implements ISagaStepHandler {
     }
   }
 
-  buildCompensationPayload(sagaId: string, _saga: Saga, stepResult: any, failureReason?: string): Record<string, any> {
+  buildCompensationPayload(
+    sagaId: string,
+    _saga: Saga,
+    stepResult: any,
+    failureReason?: string,
+  ): Record<string, any> {
     return {
       sagaId,
       reservationIds: stepResult?.reservationIds,

@@ -58,8 +58,9 @@ export const ORDER_SAGA_DEFINITION: SagaDefinition = {
           service: 'voucher',
           event: 'saga.validate-vouchers',
           // Skip nếu không có voucher nào
-          skipWhen: (sagaData) => {
-            const hasShopVouchers = sagaData.shopVouchers && Object.keys(sagaData.shopVouchers).length > 0
+          skipWhen: sagaData => {
+            const hasShopVouchers =
+              sagaData.shopVouchers && Object.keys(sagaData.shopVouchers).length > 0
             return !hasShopVouchers && !sagaData.szoneVoucherId
           },
         },
@@ -77,7 +78,7 @@ export const ORDER_SAGA_DEFINITION: SagaDefinition = {
           service: 'payment',
           event: 'saga.create-payment',
           // Chỉ tạo payment khi thanh toán bằng QRCODE
-          skipWhen: (sagaData) => sagaData.paymentMethod !== 'QRCODE',
+          skipWhen: sagaData => sagaData.paymentMethod !== 'QRCODE',
         },
         {
           name: SagaStepName.CREATE_ORDERS,
@@ -93,7 +94,7 @@ export const ORDER_SAGA_DEFINITION: SagaDefinition = {
            * COD: Không halt, tiếp tục confirm vouchers + remove cart ngay.
            */
           // thực hiện xong step CREATE_ORDERS này mới check haltAfter, nên WALLET và QROCODE vẫn chạy step CREATE_ORDERS này.
-          haltAfter: (sagaData) => sagaData.paymentMethod !== 'COD',
+          haltAfter: sagaData => sagaData.paymentMethod !== 'COD',
         },
         {
           name: SagaStepName.CONFIRM_VOUCHERS,
@@ -101,8 +102,9 @@ export const ORDER_SAGA_DEFINITION: SagaDefinition = {
           event: 'saga.confirm-vouchers',
           // Chỉ skip nếu không có voucher. Điều kiện COD không cần vì haltAfter ở trên
           // đã bảo vệ: WALLET/QRCODE sẽ không bao giờ tới step này qua main flow.
-          skipWhen: (sagaData) => {
-            const hasShopVouchers = sagaData.shopVouchers && Object.keys(sagaData.shopVouchers).length > 0
+          skipWhen: sagaData => {
+            const hasShopVouchers =
+              sagaData.shopVouchers && Object.keys(sagaData.shopVouchers).length > 0
             return !hasShopVouchers && !sagaData.szoneVoucherId
           },
         },

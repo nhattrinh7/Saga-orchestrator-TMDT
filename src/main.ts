@@ -1,5 +1,7 @@
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 import { NestFactory } from '@nestjs/core'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+
 import { AppModule } from './app.module'
 import { Transport, MicroserviceOptions } from '@nestjs/microservices'
 import { ConfigService } from '@nestjs/config'
@@ -11,6 +13,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   app.setGlobalPrefix('api')
+
+  const config = new DocumentBuilder()
+    .setTitle('saga-orchestrator API Docs')
+    .setVersion('1.0')
+    .build()
+  const document = SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup('api/v1/sagas/docs', app, document)
+
   app.useGlobalFilters(new GlobalExceptionFilter())
   app.useGlobalInterceptors(new ResponseInterceptor())
 

@@ -44,9 +44,15 @@ export class CreateOrdersStepHandler implements ISagaStepHandler {
     const paymentId = paymentResult?.paymentId
 
     const ordersData = this.buildOrdersData(
-      itemsByShop, variants, voucherResults, priceCalculation,
-      paymentMethod, paymentId, shippingAddress,
-      address.recipientName, address.recipientPhoneNumber,
+      itemsByShop,
+      variants,
+      voucherResults,
+      priceCalculation,
+      paymentMethod,
+      paymentId,
+      shippingAddress,
+      address.recipientName,
+      address.recipientPhoneNumber,
     )
 
     return {
@@ -58,7 +64,12 @@ export class CreateOrdersStepHandler implements ISagaStepHandler {
     }
   }
 
-  buildCompensationPayload(sagaId: string, saga: Saga, stepResult: any, _failureReason?: string): Record<string, any> {
+  buildCompensationPayload(
+    sagaId: string,
+    saga: Saga,
+    stepResult: any,
+    _failureReason?: string,
+  ): Record<string, any> {
     // Xác định cancel status:
     // - WALLET/QRCODE: nếu fail vì lý do thanh toán → PAYMENT_FAILED
     //   (ví dụ: sai passcode, hết số dư, timeout, payment webhook error)

@@ -31,7 +31,9 @@ export class StepHandlerRegistry {
   get(stepName: SagaStepName): ISagaStepHandler {
     const handler = this.handlers.get(stepName)
     if (!handler) {
-      throw new Error(`No step handler registered for "${stepName}". Did you forget to register it?`)
+      throw new Error(
+        `No step handler registered for "${stepName}". Did you forget to register it?`,
+      )
     }
     return handler
   }

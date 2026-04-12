@@ -1,9 +1,12 @@
 export interface PlaceOrderRequestDto {
-  itemsByShop: Record<string, Array<{
-    productId: string
-    productVariantId: string
-    quantity: number
-  }>>
+  itemsByShop: Record<
+    string,
+    Array<{
+      productId: string
+      productVariantId: string
+      quantity: number
+    }>
+  >
   shopVouchers?: Record<string, string>
   szoneVoucherId?: string
   expectedFinalPrice: number

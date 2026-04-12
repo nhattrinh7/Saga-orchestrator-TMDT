@@ -19,10 +19,6 @@ import { CqrsModule } from '@nestjs/cqrs'
       useClass: SagaStepRepository,
     },
   ],
-  exports: [
-    PrismaService,
-    SAGA_REPOSITORY,
-    SAGA_STEP_REPOSITORY,
-  ],
+  exports: [PrismaService, SAGA_REPOSITORY, SAGA_STEP_REPOSITORY],
 })
 export class DatabaseModule {}

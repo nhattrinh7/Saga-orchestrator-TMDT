@@ -10,14 +10,16 @@ export const CalculatePriceRequestSchema = z.object({
         productId: z.uuid(),
         productVariantId: z.uuid(),
         quantity: z.number().int().positive(),
-      })
-    )
+      }),
+    ),
   ),
   szoneVoucherId: z.uuid().optional(),
-  shopVouchers: z.record(
-    z.string(), // shopId
-    z.uuid() // voucherId
-  ).optional(),
+  shopVouchers: z
+    .record(
+      z.string(), // shopId
+      z.uuid(), // voucherId
+    )
+    .optional(),
 })
 
 export class CalculatePriceRequestDto extends createZodDto(CalculatePriceRequestSchema) {}

@@ -37,7 +37,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           status = HttpStatus.UNPROCESSABLE_ENTITY
         }
       }
-    // Nếu là Error thường
+      // Nếu là Error thường
     } else if (exception instanceof Error) {
       message = exception.message
     }

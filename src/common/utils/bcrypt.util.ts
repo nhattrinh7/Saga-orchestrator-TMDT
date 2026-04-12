@@ -22,10 +22,7 @@ export const hashOTP = async (otp: string): Promise<string> => {
   return hashedOTP
 }
 
-export const compareOTP = async (
-  OtpFromFE: string,
-  hashedOtpFromDB: string,
-): Promise<boolean> => {
+export const compareOTP = async (OtpFromFE: string, hashedOtpFromDB: string): Promise<boolean> => {
   const result = await compare(OtpFromFE, hashedOtpFromDB)
   return result
 }

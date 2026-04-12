@@ -33,8 +33,9 @@ export class PaymentGateway implements OnGatewayConnection, OnGatewayDisconnect,
   async handleConnection(client: Socket) {
     try {
       // Auth middleware
-      const token = client.handshake.auth?.token // nếu ở FE khi khởi tạo kết nối có truyền token vào trong option auth
-        || client.handshake.headers?.authorization?.replace('Bearer ', '') // hoặc lấy accessToken từ header authorization
+      const token =
+        client.handshake.auth?.token || // nếu ở FE khi khởi tạo kết nối có truyền token vào trong option auth
+        client.handshake.headers?.authorization?.replace('Bearer ', '') // hoặc lấy accessToken từ header authorization
 
       if (!token) {
         client.disconnect()
@@ -87,7 +88,9 @@ export class PaymentGateway implements OnGatewayConnection, OnGatewayDisconnect,
    * Tự kiểm tra expiration + signature.
    * Trả về payload { userId, roleId } nếu hợp lệ, null nếu không.
    */
-  private async verifyAccessToken(token: string): Promise<{ userId: string; roleId: string } | null> {
+  private async verifyAccessToken(
+    token: string,
+  ): Promise<{ userId: string; roleId: string } | null> {
     try {
       const payload = await this.jwtService.verifyAsync<{ userId: string; roleId: string }>(token, {
         secret: this.accessTokenSecret,

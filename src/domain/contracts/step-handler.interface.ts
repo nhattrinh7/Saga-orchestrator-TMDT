@@ -60,11 +60,7 @@ export interface ISagaStepHandler {
    * @param previousResults - Kết quả của các steps trước
    * @returns Kết quả xử lý, hoặc throw error nếu thất bại
    */
-  executeLocal?(
-    sagaId: string,
-    saga: Saga,
-    previousResults: Map<SagaStepName, any>,
-  ): any
+  executeLocal?(sagaId: string, saga: Saga, previousResults: Map<SagaStepName, any>): any
 
   /**
    * Hook chạy sau khi step hoàn thành thành công.
@@ -72,9 +68,5 @@ export interface ISagaStepHandler {
    * Engine gọi method này sau khi update step status = COMPLETED.
    * Optional — chỉ implement khi step cần side-effects.
    */
-  afterComplete?(
-    sagaId: string,
-    saga: Saga,
-    stepResult: any,
-  ): Promise<void>
+  afterComplete?(sagaId: string, saga: Saga, stepResult: any): Promise<void>
 }

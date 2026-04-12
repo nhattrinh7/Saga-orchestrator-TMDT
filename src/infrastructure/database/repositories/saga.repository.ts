@@ -10,11 +10,14 @@ import { SagaStepName, StepStatus } from '~/domain/enums/saga-step.enum'
 export class SagaRepository implements ISagaRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createSaga(data: {
-    userId: string
-    sagaType: string
-    data: any
-  }, tx?: any): Promise<Saga> {
+  async createSaga(
+    data: {
+      userId: string
+      sagaType: string
+      data: any
+    },
+    tx?: any,
+  ): Promise<Saga> {
     const client = tx || this.prisma
     const saga = await client.saga.create({
       data: {
@@ -29,11 +32,14 @@ export class SagaRepository implements ISagaRepository {
     return new Saga({
       ...saga,
       status: saga.status as SagaStatus,
-      steps: saga.steps.map(step => new SagaStep({
-        ...step,
-        status: step.status as StepStatus,
-        stepName: step.stepName as SagaStepName,
-      })),
+      steps: saga.steps.map(
+        step =>
+          new SagaStep({
+            ...step,
+            status: step.status as StepStatus,
+            stepName: step.stepName as SagaStepName,
+          }),
+      ),
     })
   }
 
@@ -48,20 +54,28 @@ export class SagaRepository implements ISagaRepository {
     return new Saga({
       ...saga,
       status: saga.status as SagaStatus,
-      steps: saga.steps.map(step => new SagaStep({
-        ...step,
-        status: step.status as StepStatus,
-        stepName: step.stepName as SagaStepName,
-      })),
+      steps: saga.steps.map(
+        step =>
+          new SagaStep({
+            ...step,
+            status: step.status as StepStatus,
+            stepName: step.stepName as SagaStepName,
+          }),
+      ),
     })
   }
 
-  async updateSagaStatus(sagaId: string, status: SagaStatus, extras?: {
-    currentStep?: string | null
-    failureReason?: string
-    completedAt?: Date
-    compensatedAt?: Date
-  }, tx?: any): Promise<void> {
+  async updateSagaStatus(
+    sagaId: string,
+    status: SagaStatus,
+    extras?: {
+      currentStep?: string | null
+      failureReason?: string
+      completedAt?: Date
+      compensatedAt?: Date
+    },
+    tx?: any,
+  ): Promise<void> {
     const client = tx || this.prisma
     await client.saga.update({
       where: { id: sagaId },

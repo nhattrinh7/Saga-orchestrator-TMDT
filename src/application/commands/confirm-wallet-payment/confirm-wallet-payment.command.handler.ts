@@ -2,9 +2,18 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { Inject, HttpException, HttpStatus } from '@nestjs/common'
 import { ConfirmWalletPaymentCommand } from './confirm-wallet-payment.command'
 import { ConfirmWalletPaymentResponseDto } from '~/presentation/dtos/place-order.dto'
-import { type ISagaRepository, SAGA_REPOSITORY } from '~/domain/repositories/saga.repository.interface'
-import { type ISagaStepRepository, SAGA_STEP_REPOSITORY } from '~/domain/repositories/saga-step.repository.interface'
-import { type IMessagePublisher, MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
+import {
+  type ISagaRepository,
+  SAGA_REPOSITORY,
+} from '~/domain/repositories/saga.repository.interface'
+import {
+  type ISagaStepRepository,
+  SAGA_STEP_REPOSITORY,
+} from '~/domain/repositories/saga-step.repository.interface'
+import {
+  type IMessagePublisher,
+  MESSAGE_PUBLISHER,
+} from '~/domain/contracts/message-publisher.interface'
 import { SagaStatus } from '~/domain/enums/saga.enum'
 import { SagaStepName, StepStatus } from '~/domain/enums/saga-step.enum'
 import { PrismaService } from '~/infrastructure/database/prisma/prisma.service'
@@ -31,10 +40,7 @@ export class ConfirmWalletPaymentHandler implements ICommandHandler<ConfirmWalle
     // Validate saga
     const saga = await this.sagaRepo.findById(sagaId)
     if (!saga) {
-      throw new HttpException(
-        { success: false, error: 'Saga không tồn tại' },
-        HttpStatus.NOT_FOUND,
-      )
+      throw new HttpException({ success: false, error: 'Saga không tồn tại' }, HttpStatus.NOT_FOUND)
     }
 
     if (saga.userId !== userId) {
@@ -61,7 +67,10 @@ export class ConfirmWalletPaymentHandler implements ICommandHandler<ConfirmWalle
     }
 
     // Lấy amount từ CALCULATE_AND_VERIFY_PRICE step
-    const calcStep = await this.sagaStepRepo.findStepByName(sagaId, SagaStepName.CALCULATE_AND_VERIFY_PRICE)
+    const calcStep = await this.sagaStepRepo.findStepByName(
+      sagaId,
+      SagaStepName.CALCULATE_AND_VERIFY_PRICE,
+    )
     const amount = calcStep?.result?.finalPrice
 
     if (!amount) {
@@ -74,7 +83,10 @@ export class ConfirmWalletPaymentHandler implements ICommandHandler<ConfirmWalle
     // Kiểm tra saga đã halt sau CREATE_ORDERS chưa.
     // Tránh race condition: user nhập passcode quá nhanh khi saga vẫn đang chạy
     // RESERVE_INVENTORY / CREATE_ORDERS → compensation sẽ không tìm thấy orders để cancel.
-    const createOrdersStep = await this.sagaStepRepo.findStepByName(sagaId, SagaStepName.CREATE_ORDERS)
+    const createOrdersStep = await this.sagaStepRepo.findStepByName(
+      sagaId,
+      SagaStepName.CREATE_ORDERS,
+    )
     if (!createOrdersStep || createOrdersStep.status !== StepStatus.COMPLETED) {
       throw new HttpException(
         { success: false, message: 'Đơn hàng chưa sẵn sàng để thanh toán, vui lòng thử lại' },
@@ -83,9 +95,17 @@ export class ConfirmWalletPaymentHandler implements ICommandHandler<ConfirmWalle
     }
 
     // Transaction: createStep + updateSagaStatus phải atomic
-    await this.prismaService.transaction(async (tx) => {
-      await this.sagaStepRepo.createStep({ sagaId, stepName: SagaStepName.PROCESS_WALLET_PAYMENT }, tx)
-      await this.sagaRepo.updateSagaStatus(sagaId, SagaStatus.PROCESSING, { currentStep: SagaStepName.PROCESS_WALLET_PAYMENT }, tx)
+    await this.prismaService.transaction(async tx => {
+      await this.sagaStepRepo.createStep(
+        { sagaId, stepName: SagaStepName.PROCESS_WALLET_PAYMENT },
+        tx,
+      )
+      await this.sagaRepo.updateSagaStatus(
+        sagaId,
+        SagaStatus.PROCESSING,
+        { currentStep: SagaStepName.PROCESS_WALLET_PAYMENT },
+        tx,
+      )
     })
 
     // Emit event (ngoài transaction — fire-and-forget)

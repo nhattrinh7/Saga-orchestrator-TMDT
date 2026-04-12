@@ -39,16 +39,11 @@ const OrderSagaStepHandlers = [
   ProcessWalletPaymentStepHandler,
 ]
 
-const CommandHandlers = [
-  PlaceOrderHandler,
-  ConfirmWalletPaymentHandler,
-]
+const CommandHandlers = [PlaceOrderHandler, ConfirmWalletPaymentHandler]
 
-const QueryHandlers = [
-]
+const QueryHandlers = []
 
-const EventHandlers = [
-]
+const EventHandlers = []
 
 @Module({
   imports: [

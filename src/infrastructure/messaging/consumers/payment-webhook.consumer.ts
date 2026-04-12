@@ -23,7 +23,8 @@ export class PaymentWebhookConsumer extends BaseRetryConsumer {
 
   @EventPattern('saga.payment-webhook')
   async handlePaymentWebhook(
-    @Payload() data: {
+    @Payload()
+    data: {
       sagaId: string
       paymentId: string
       paymentCode: string
@@ -49,13 +50,11 @@ export class PaymentWebhookConsumer extends BaseRetryConsumer {
 
       // ***CÓ emitPaymentSuccess trong handlePostPaymentSuccess***
       // Xử lý post-payment steps (update orders, confirm vouchers, remove cart)
-      await this.sagaEngine.handlePostPaymentSuccess(
-        sagaId,
-        {
-          paymentId: data.paymentId,
-          paymentCode: data.paymentCode,
-          transferAmount: data.transferAmount,
-        })
+      await this.sagaEngine.handlePostPaymentSuccess(sagaId, {
+        paymentId: data.paymentId,
+        paymentCode: data.paymentCode,
+        transferAmount: data.transferAmount,
+      })
     })
   }
 }
