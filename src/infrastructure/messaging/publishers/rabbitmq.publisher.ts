@@ -26,37 +26,37 @@ export class RabbitMQPublisher implements IMessagePublisher {
   }
 
   emitToCatalogService<T>(pattern: string, data: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → catalog-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → catalog-service`)
     this.catalogClient.emit(pattern, this.buildRecord(data))
   }
 
   emitToUserService<T>(pattern: string, data: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → user-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → user-service`)
     this.userClient.emit(pattern, this.buildRecord(data))
   }
 
   emitToVoucherService<T>(pattern: string, data: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → voucher-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → voucher-service`)
     this.voucherClient.emit(pattern, this.buildRecord(data))
   }
 
   emitToInventoryService<T>(pattern: string, data: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → inventory-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → inventory-service`)
     this.inventoryClient.emit(pattern, this.buildRecord(data))
   }
 
   emitToOrderService<T>(pattern: string, data: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → order-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → order-service`)
     this.orderClient.emit(pattern, this.buildRecord(data))
   }
 
   emitToPaymentService<T>(pattern: string, data: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → payment-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → payment-service`)
     this.paymentClient.emit(pattern, this.buildRecord(data))
   }
 
   emitToNotificationService<T>(pattern: string, data: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → notification-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → notification-service`)
     this.notificationClient.emit(pattern, this.buildRecord(data))
   }
 }

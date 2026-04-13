@@ -39,9 +39,11 @@ export abstract class BaseRetryConsumer {
       }
 
       try {
+        const startTime = Date.now()
         const result = await handler()
+        const duration = Date.now() - startTime
         channel.ack(originalMsg)
-        this.logger.log(`[kongRequestId=${kongRequestId}] Message processed successfully`)
+        this.logger.log(`[kongRequestId=${kongRequestId}] Message processed successfully (${duration}ms)`)
         return result
       } catch {
         const baseDelayForRetry = this.baseDelay * Math.pow(2, retryCount)
