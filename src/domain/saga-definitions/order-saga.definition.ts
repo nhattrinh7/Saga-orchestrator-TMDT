@@ -116,11 +116,6 @@ export const ORDER_SAGA_DEFINITION: SagaDefinition = {
           // Step này chỉ chạy với COD (qua main flow).
           // WALLET/QRCODE: remove cart items được xử lý bởi handlePostPaymentSuccess().
         },
-        {
-          name: SagaStepName.INCREASE_BUY_COUNT,
-          service: 'catalog',
-          event: 'saga.increase-buy-count',
-        },
       ],
     },
   ],

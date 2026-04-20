@@ -223,22 +223,7 @@ export class SagaEngine {
       productVariantIds,
     })
 
-    // 4. Tăng buy_count cho sản phẩm
-    const quantities = new Map<string, number>()
-    for (const item of allItems) {
-      const current = quantities.get(item.productId) ?? 0
-      quantities.set(item.productId, current + item.quantity)
-    }
-    const items = Array.from(quantities.entries()).map(([productId, quantity]) => ({
-      productId,
-      quantity,
-    }))
-    if (items.length > 0) {
-      this.emitToService('catalog', 'saga.increase-buy-count', {
-        sagaId,
-        items,
-      })
-    }
+    // 4. [Buy_count hiện được cập nhật tự động bằng Debezium CDC thông qua bảng inventories]
 
     // 5. Hoàn thành saga
     await this.sagaRepo.updateSagaStatus(sagaId, SagaStatus.COMPLETED, {
